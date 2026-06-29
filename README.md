@@ -123,12 +123,3 @@ cypress/
    sem autenticação e links de rodapé.
 6. **Usuários especiais** — verificação dos comportamentos de
    `performance_glitch_user`, `problem_user`, `error_user` e `visual_user`.
-
-## ⚠️ Observação técnica
-
-O SauceDemo registra um *service worker* que faz cache das páginas e, após
-algumas navegações, deixa de disparar o evento `load` esperado pelo Cypress,
-causando falhas intermitentes de `timedOutWaitingForPageLoad`. A suíte contorna
-isso removendo o *service worker* antes de cada carregamento de página
-(`cypress/support/e2e.js`) e usando um parâmetro *cache-busting* em
-`cy.visitFresh`. Detalhes em [RELATORIO.md](./RELATORIO.md).

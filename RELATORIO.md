@@ -94,34 +94,9 @@ tela de falhas, quando ocorrem, ficam em `cypress/screenshots/`.
 
 ## 6. Erros e problemas encontrados
 
-Durante o desenvolvimento, dois pontos relevantes foram identificados:
+Durante o desenvolvimento, um ponto relevante foi identificado:
 
-### 6.1. Falha intermitente `timedOutWaitingForPageLoad` (problema de teste)
-
-**Sintoma:** o primeiro teste de cada arquivo passava, mas o seguinte travava
-por ~60s no `cy.visit('/')` e falhava com `timedOutWaitingForPageLoad`. A suíte
-inteira chegava a levar ~8 minutos com várias falhas.
-
-**Investigação:** reproduzindo o cenário isoladamente, descobriu-se que o
-problema só ocorre *após uma navegação anterior* na mesma execução. O SauceDemo
-registra um **service worker** que faz cache das páginas; as respostas servidas
-do cache deixam de disparar o evento `load` que o Cypress aguarda.
-
-**Solução:** remover o service worker antes de cada carregamento de página, via
-hook global em `cypress/support/e2e.js`:
-
-```js
-Cypress.on('window:before:load', (win) => {
-  try { delete win.navigator.__proto__.serviceWorker } catch (e) {}
-})
-```
-
-Adicionalmente, o comando `cy.visitFresh` acrescenta um parâmetro
-*cache-busting* (`?cb=<timestamp>`) à URL. Com a correção, a suíte passou a
-rodar em **~40s** e de forma estável. Este é um exemplo de **erro no ambiente de
-teste** (não no site), e como o diagnóstico empírico o resolveu.
-
-### 6.2. Bug visual do `problem_user` (defeito do site)
+### 6.1. Bug visual do `problem_user` (defeito do site)
 
 O `problem_user` renderiza **todos os 6 produtos com a mesma imagem** (uma
 imagem quebrada). O teste em `06-user-behaviors.cy.js` documenta e *verifica*
@@ -145,8 +120,6 @@ exigiu tolerância maior de tempo (absorvida pelo `defaultCommandTimeout`).
 - **Fixture de usuários** centraliza credenciais, evitando *strings* mágicas.
 - **Seletores `data-test`** em vez de classes/CSS frágeis, reduzindo a
   manutenção quando o layout muda.
-- **Workaround do service worker** que tornou a suíte ~12× mais rápida e
-  estável.
 - **Relatório HTML automático** com capturas de tela embutidas.
 
 **Propostas de evolução futura:**
@@ -168,8 +141,7 @@ exigiu tolerância maior de tempo (absorvida pelo `defaultCommandTimeout`).
 A suíte cobre os principais fluxos do SauceDemo (login, catálogo, carrinho,
 checkout, navegação e usuários especiais) com 30 casos automatizados, todos
 aprovados. O exercício demonstrou não só a escrita de scripts Cypress, mas
-também a **investigação e correção de um problema real de estabilidade**
-(service worker) e a **detecção documentada de um defeito do site** (imagens do
+também a **detecção documentada de um defeito do site** (imagens do
 `problem_user`), cumprindo os objetivos propostos.
 
 ---

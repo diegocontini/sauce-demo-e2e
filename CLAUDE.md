@@ -36,7 +36,7 @@ cypress/
   fixtures/users.json          # usernames + shared password
   support/
     commands.js                # custom commands
-    e2e.js                     # global hooks (service-worker workaround)
+    e2e.js                     # global hooks
   reports/index.html           # generated test report (gitignored)
 ```
 
@@ -53,19 +53,6 @@ All accounts share the password `secret_sauce`. Usernames live in
 - `cy.visitFresh(path?)` — visit with a cache-busting query param.
 - `cy.addProductToCart(productName)` — add a product by its visible name.
 - `cy.cartCount()` — read the cart badge (0 when absent).
-
-## Important gotcha: SauceDemo service worker
-
-SauceDemo registers a service worker that caches served pages. After several
-in-suite navigations the cached responses stop firing the `load` event Cypress
-waits for, causing intermittent **`timedOutWaitingForPageLoad`** failures (the
-first test of each spec passes, later ones hang ~60s and fail).
-
-The fix lives in `cypress/support/e2e.js`: a global `window:before:load` hook
-deletes `navigator.serviceWorker` before every page load, so each navigation is
-a real network request. `cy.visitFresh` additionally appends a cache-busting
-query param. **Do not remove these** or the suite becomes flaky and slow. With
-the workaround the full suite runs in ~40s; without it, ~8min with failures.
 
 ## Conventions
 
