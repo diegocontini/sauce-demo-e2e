@@ -177,7 +177,7 @@ também a **investigação e correção de um problema real de estabilidade**
 ## Anexo — Como reproduzir
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone git@github.com:diegocontini/sauce-demo-e2e.git
 cd cypress-proj
 npm install
 npm run cy:run
